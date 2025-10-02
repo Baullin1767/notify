@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: notify
+      POSTGRES_USER: notify
+      POSTGRES_PASSWORD: notify
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000 --settings=notify.settings_docker_dev
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: notify.settings_docker_dev
+      SECRET_KEY: dev-insecure-secret-key
+      POSTGRES_DB: notify
+      POSTGRES_USER: notify
+      POSTGRES_PASSWORD: notify
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
